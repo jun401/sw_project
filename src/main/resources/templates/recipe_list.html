@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>레시피 목록</title>
+</head>
+<body>
+
+<h2>📚 레시피 목록 (DB 기반)</h2>
+
+<ul>
+    <li th:each="r : ${recipes}">
+        <a th:href="@{|/recipes/${r.recipeId}|}" th:text="${r.name}"></a>
+        — <span th:text="${r.kcalPerServ}">0</span> kcal
+    </li>
+</ul>
+
+</body>
+</html>

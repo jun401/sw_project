@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${recipe.name}">레시피 상세</title>
+</head>
+<body>
+
+<h2 th:text="${recipe.name}"></h2>
+<p>🔥 칼로리: <span th:text="${recipe.kcalPerServ}"></span> kcal</p>
+
+<h3>🥬 필요한 재료</h3>
+<ul>
+    <li th:each="ri : ${ingredients}">
+        <span th:text="${ri.ingredient.name}"></span>
+        <span th:text="${ri.amountValue}"></span>
+        <span th:text="${ri.amountUnit}"></span>
+    </li>
+</ul>
+
+<a href="/recipes">← 목록으로</a>
+
+</body>
+</html>

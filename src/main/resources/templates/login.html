@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인</title>
+
+    <!-- 배민 + 구글 감성 폰트 -->
+    <link href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2107@1.1/BMHANNAPro.woff2" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(to bottom right, #ffffff, #f9fff7, #f2fff3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            width: 380px;
+            background: #ffffff;
+            padding: 40px 32px;
+            border-radius: 22px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 32px;
+            font-family: 'BMHANNAPro', 'Noto Sans KR', sans-serif;
+            letter-spacing: -1px;
+            color: #222;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            border-radius: 16px;
+            border: 2px solid #e3e3e3;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        .input-field:focus {
+            border-color: #34a853;
+            box-shadow: 0 0 0 4px rgba(52, 168, 83, 0.25);
+            outline: none;
+        }
+
+        button.login-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            background: linear-gradient(90deg, #34a853, #4bd468);
+            color: white;
+            font-size: 18px;
+            border-radius: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 25px;
+        }
+
+        .signup-text {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .signup-text a {
+            color: #34a853;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .signup-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* 회원가입 성공 메시지 스타일 */
+        .success-msg {
+            text-align: center;
+            color: #1a7f37;
+            font-size: 14px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <h2>로그인</h2>
+
+    <!-- ⭐ 회원가입 성공 메시지 표시 -->
+    <p th:if="${param.signupSuccess}" class="success-msg">
+        회원가입이 완료되었습니다! 로그인하세요.
+    </p>
+
+    <form action="/doLogin" method="post">
+
+        <label>아이디</label>
+        <input type="text" class="input-field" name="username" required autocomplete="username">
+
+        <label>비밀번호</label>
+        <input type="password" class="input-field" name="password" required autocomplete="current-password">
+
+        <button type="submit" class="login-btn">로그인</button>
+    </form>
+
+    <div class="signup-text">
+        아직 계정이 없으신가요?
+        <a href="/signup">회원가입 →</a>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>📊 식단 리포트 대시보드</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(to bottom right, #f9fff7, #ffffff);
+      margin: 0;
+      padding: 40px;
+      color: #333;
+      text-align: center;
+    }
+    h1 { color: #2e7d32; font-size: 38px; margin-bottom: 10px; }
+    .summary { margin-bottom: 25px; font-size: 18px; color: #555; }
+    .chart-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 40px;
+      justify-items: center;
+      margin-top: 40px;
+    }
+    canvas {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 420px;
+      width: 100%;
+      height: 320px;
+    }
+    .back {
+      display: inline-block;
+      margin-top: 40px;
+      color: #388e3c;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .back:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>📊 이번 주 식단 리포트</h1>
+
+  <p class="summary">
+    🥗 평균 칼로리:
+    <strong th:text="${avgKcal} != null ? ${avgKcal} + ' kcal' : '0 kcal'">1750 kcal</strong>
+    |
+    🍎 영양 비율:
+    <strong th:text="'탄 ' + (${carb}?:45) + '% / 단 ' + (${protein}?:35) + '% / 지 ' + (${fat}?:20) + '%'">
+      탄 45% / 단 35% / 지 20%
+    </strong>
+  </p>
+
+  <div class="chart-container">
+    <!-- 1️⃣ 하루별 칼로리 -->
+    <canvas id="calorieChart" aria-label="일별 칼로리 그래프" role="img"></canvas>
+
+    <!-- 2️⃣ 영양소 비율 -->
+    <canvas id="nutrientChart" aria-label="탄단지 비율 도넛" role="img"></canvas>
+
+    <!-- 3️⃣ 재료 사용 빈도 -->
+    <canvas id="ingredientChart" aria-label="재료 사용 빈도 막대" role="img"></canvas>
+  </div>
+
+  <a href="/main" class="back">← 메인으로 돌아가기</a>
+
+  <!-- ✅ Thymeleaf JS 인라인: 값이 없을 때도 안전한 기본값 제공 -->
+  <script th:inline="javascript">
+    // ── 서버에서 넘어온 값들 (없으면 기본값으로 대체) ─────────────────────────
+    const avgKcal = /*[[${avgKcal}?:0]]*/ 0;
+
+    const carb    = /*[[${carb}?:45]]*/ 45;
+    const protein = /*[[${protein}?:35]]*/ 35;
+    const fat     = /*[[${fat}?:20]]*/ 20;
+
+    // List/Collection은 JS 배열로 안전하게 렌더링됨(th:inline="javascript" 필요)
+    const ingredientLabels = /*[[${ingredientLabels}?:[]]]*/ [];
+    const ingredientData   = /*[[${ingredientData}?:[]]]*/ [];
+
+    // ── 1) 일별 칼로리 그래프 (샘플/데모 데이터: DB 연동 전용) ────────────────
+    const calorieCtx = document.getElementById("calorieChart");
+    new Chart(calorieCtx, {
+      type: "line",
+      data: {
+        labels: ["월", "화", "수", "목", "금", "토", "일"],
+        datasets: [{
+          label: "일일 섭취 칼로리",
+          data: [1600, 1800, 1700, 1900, 1750, 2000, 1850],
+          borderWidth: 2,
+          borderColor: "#4caf50",
+          backgroundColor: "rgba(76,175,80,0.18)",
+          fill: true,
+          tension: 0.3,
+          pointRadius: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: true },
+          title: { display: true, text: "📅 일별 칼로리 변화" },
+          tooltip: { enabled: true }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+    // ── 2) 영양 비율 도넛 차트 ────────────────────────────────────────────────
+    const nutrientCtx = document.getElementById("nutrientChart");
+    new Chart(nutrientCtx, {
+      type: "doughnut",
+      data: {
+        labels: ["탄수화물", "단백질", "지방"],
+        datasets: [{
+          data: [carb, protein, fat],
+          backgroundColor: ["#66bb6a", "#42a5f5", "#ffb74d"],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: { display: true, text: "🍎 탄단지 비율" },
+          legend: { position: "bottom" },
+          tooltip: { enabled: true }
+        },
+        cutout: "60%"
+      }
+    });
+
+    // ── 3) 재료 사용 빈도 막대 차트 (데이터 없으면 안내 문구 처리) ─────────────
+    const ingCtx = document.getElementById("ingredientChart");
+    const labelsSafe = Array.isArray(ingredientLabels) ? ingredientLabels : [];
+    const dataSafe   = Array.isArray(ingredientData) ? ingredientData : [];
+
+    new Chart(ingCtx, {
+      type: "bar",
+      data: {
+        labels: labelsSafe.length ? labelsSafe : ["데이터 없음"],
+        datasets: [{
+          label: "사용 횟수",
+          data: dataSafe.length ? dataSafe : [0],
+          backgroundColor: "#81c784",
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: { display: true, text: "🥦 재료 사용 빈도" },
+          legend: { display: false },
+          tooltip: { enabled: true }
+        },
+        scales: {
+          x: { ticks: { color: "#333" } },
+          y: { beginAtZero: true, ticks: { stepSize: 1 } }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

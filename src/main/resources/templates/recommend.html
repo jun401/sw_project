@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>🍱 오늘의 추천 메뉴</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    crossorigin="anonymous"
+  />
+  <style>
+    body {
+      font-family: 'BMHANNAPro', 'Noto Sans KR', sans-serif;
+      background: linear-gradient(to bottom right, #f9fff7, #ffffff);
+      text-align: center;
+      margin: 0;
+      padding: 40px;
+      color: #333;
+      animation: fadeIn 1.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 52px;
+      font-weight: 800;
+      color: #2e7d32;
+      margin-bottom: 10px;
+    }
+
+    p.subtitle {
+      font-size: 18px;
+      color: #555;
+      margin-bottom: 30px;
+    }
+
+    .card-container {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 280px;
+      padding: 15px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+
+    .card h3 {
+      font-size: 20px;
+      margin: 10px 0 5px;
+      color: #2e7d32;
+    }
+
+    .card p {
+      font-size: 15px;
+      color: #666;
+      margin: 3px 0;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-top: 40px;
+      background: #4CAF50;
+      color: #fff;
+      padding: 12px 30px;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: background 0.3s ease;
+      font-size: 18px;
+    }
+
+    .back-btn:hover {
+      background: #388e3c;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍱 오늘의 추천 메뉴</h1>
+  <p class="subtitle">AI가 공공데이터 1146개 중에서 오늘의 메뉴 3개를 추천했어요!</p>
+
+  <div class="card-container">
+    <div class="card" th:each="menu : ${recommendList}">
+      <img th:src="${menu.image}" alt="레시피 이미지" onerror="this.src='/images/default_food.jpg';" />
+      <h3 th:text="${menu.recipeName}">레시피 이름</h3>
+      <p th:text="'칼로리: ' + ${menu.kcal} + ' kcal'">칼로리</p>
+      <p th:text="'조리법: ' + ${menu.method}">조리법</p>
+    </div>
+  </div>
+
+  <a href="/main" class="back-btn">← 메인으로 돌아가기</a>
+</body>
+</html>

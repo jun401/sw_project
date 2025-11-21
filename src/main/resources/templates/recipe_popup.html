@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>레시피 검색</title>
+
+  <style>
+    body { font-family: 'Noto Sans KR', sans-serif; padding: 20px; background: #fafafa; }
+    h2 { color: #333; text-align: center; margin-bottom: 20px; }
+    .recipe { background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    img { width: 200px; border-radius: 10px; display: block; margin: 10px 0; }
+    button { background-color: #4CAF50; color: white; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer; margin-top: 5px; }
+    button:hover { background-color: #43a047; }
+    .search-box { text-align: center; margin-bottom: 20px; }
+    .search-box input { width: 70%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+    .search-box button { background-color: #2196F3; margin-left: 10px; color: white; border: none; border-radius: 5px; padding: 8px 10px; cursor: pointer; }
+    .search-box button:hover { background-color: #1976D2; }
+  </style>
+</head>
+
+<body>
+
+<h2 th:text="'📅 ' + ${date} + ' 레시피 검색'"></h2>
+
+<div class="search-box">
+  <input type="text" id="menuInput" placeholder="메뉴명을 입력하세요">
+  <button type="button" onclick="searchRecipe()">검색</button>
+</div>
+
+<div id="recipeList">
+  <div th:each="r : ${recipes}" class="recipe">
+
+    <h3 th:text="${r.name}"></h3>
+
+    <img th:src="${r.image}" alt="이미지없음"/>
+
+    <p><strong>칼로리:</strong> <span th:text="${r.kcal}"></span> kcal</p>
+
+    <p><strong>조리 순서:</strong></p>
+    <ul>
+      <li th:each="m : ${r.manualList}" th:text="${m}"></li>
+    </ul>
+
+    <p><strong>재료:</strong></p>
+    <p th:text="${r.ingredients}">재료 정보 없음</p>
+
+  </div>
+</div>
+
+<script th:inline="javascript">
+
+  const dateStr = /*[[${date}]]*/ '';
+
+  function searchRecipe() {
+    const menu = document.getElementById("menuInput").value.trim();
+    if (!menu) return alert("메뉴를 입력해주세요!");
+
+    location.href = `/recipe-popup?date=${dateStr}&menu=${menu}`;
+  }
+
+</script>
+
+</body>
+</html>

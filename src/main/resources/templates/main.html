@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>🥗 식단 도우미</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    crossorigin="anonymous"
+  />
+  <!-- ✅ 배달의민족 폰트 -->
+  <link href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2107@1.1/BMHANNAPro.woff2" rel="stylesheet" type="text/css" crossorigin>
+
+  <style>
+    /* ====== 기본 설정 ====== */
+    body {
+      font-family: 'BMHANNAPro', 'Noto Sans KR', sans-serif;
+      background: linear-gradient(to bottom right, #ffffff, #f9fff7, #f2fff3);
+      text-align: center;
+      margin: 0;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 1.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* ====== 타이틀 ====== */
+    h1 {
+      font-size: 110px;
+      font-weight: 900;
+      margin: 80px 0 10px 0;
+      background: linear-gradient(90deg, #4CAF50, #81C784, #FFB74D, #FF7043, #4CAF50);
+      background-size: 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientMove 8s ease-in-out infinite;
+      text-shadow:
+        0 0 3px rgba(255,255,255,0.8),
+        3px 3px 6px rgba(0,0,0,0.3);
+      -webkit-text-stroke: 1px rgba(0,0,0,0.2);
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ====== 문구 효과 ====== */
+    #subText {
+      font-size: 24px;
+      color: #333;
+      font-weight: 600;
+      margin-bottom: 20px;
+      transition: opacity 1s ease;
+    }
+
+    .fade-out { opacity: 0; transform: translateY(5px); transition: all 0.8s ease; }
+    .fade-in { opacity: 1; transform: translateY(0); transition: all 0.8s ease; }
+
+    /* ====== 검색창 ====== */
+    .search-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #dadce0;
+      border-radius: 50px;
+      padding: 10px 20px;
+      width: 90%;
+      max-width: 580px;
+      height: 50px;
+      box-shadow: 0 1px 6px rgba(32,33,36,0.28);
+      background: white;
+      margin-top: 30px;
+    }
+
+    input[type="text"] {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 18px;
+      background: transparent;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 22px;
+      color: #5f6368;
+      transition: all 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      color: #34a853;
+      transform: scale(1.1);
+    }
+
+    /* ====== 추천 문구 ====== */
+    #recommend {
+      font-size: 22px;
+      color: #222;
+      margin-top: 30px;
+      transition: opacity 1s ease;
+    }
+
+    /* ====== 바로가기 ====== */
+    .shortcut-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 40px;
+    }
+
+    /* ✅ 수정됨 — 구글 스타일로 작고 자연스럽게 변경 */
+    .shortcut-card {
+      width: 78px;
+      height: 78px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .shortcut-card:hover {
+      transform: scale(1.05);
+      background: #f7faf8;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .shortcut-card i {
+      font-size: 22px;
+      color: #34a853;
+      margin-bottom: 6px;
+    }
+
+    .shortcut-card span {
+      font-size: 11px;
+      color: #555;
+      font-weight: 500;
+      letter-spacing: -0.2px;
+    }
+
+    .add-card {
+      background: #f9f9f9;
+      border: 2px dashed #c8e6c9;
+    }
+
+    .add-card:hover {
+      background: #eef8f0;
+    }
+    /* ✅ 수정 끝 */
+
+    /* ====== 바로가기 팝업 ====== */
+    .shortcut-modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #2b2b2b;
+      color: white;
+      border-radius: 10px;
+      padding: 25px;
+      width: 350px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      z-index: 100;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .shortcut-modal h3 { margin-top: 0; margin-bottom: 15px; }
+    .shortcut-modal input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: none;
+      background: #444;
+      color: white;
+    }
+
+    .shortcut-modal button {
+      border: none;
+      padding: 8px 15px;
+      border-radius: 6px;
+      margin-right: 8px;
+      cursor: pointer;
+    }
+
+    .save-btn { background: #4CAF50; color: white; }
+    .cancel-btn { background: #555; color: white; }
+
+    .context-menu {
+      display: none;
+      position: absolute;
+      background: #222;
+      color: white;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      z-index: 99;
+      font-size: 14px;
+    }
+
+    .context-menu div {
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+
+    .context-menu div:hover { background: #444; }
+
+    /* ====== SNS ====== */
+    .social-links {
+      margin: 25px 0;
+    }
+
+    .social-links a {
+      margin: 0 14px;
+      font-size: 30px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .social-links a.instagram { color: #E4405F; }
+    .social-links a.facebook { color: #1877F2; }
+    .social-links a.youtube { color: #FF0000; }
+
+    .social-links a:hover {
+      transform: scale(1.2);
+      filter: brightness(1.2);
+    }
+
+    footer {
+      width: 100%;
+      color: #777;
+      font-size: 14px;
+      text-align: center;
+      padding-bottom: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>식단도우미</h1>
+  <p id="subText">AI가 추천하는 당신만의 맞춤 식단 🍱</p>
+
+  <div class="search-box">
+    <input type="text" id="menuInput" placeholder="무엇을 도와드릴까요? (예: 레시피, 캘린더, 장보기)" />
+    <button class="icon-btn"><i class="fa-solid fa-microphone"></i></button>
+  </div>
+
+  <p id="recommend">오늘은 🍱 <strong>비빔밥</strong> 어때요?</p>
+
+  <!-- ✅ 바로가기 영역 -->
+  <div class="shortcut-container" id="shortcutContainer">
+    <div class="shortcut-card add-card" onclick="openModal()">
+      <i class="fa-solid fa-plus"></i>
+      <span>바로가기 추가</span>
+    </div>
+  </div>
+
+  <!-- ✅ 바로가기 추가 모달 -->
+  <div class="shortcut-modal" id="shortcutModal">
+    <h3>바로가기 추가</h3>
+    <input type="text" id="shortcutName" placeholder="이름" />
+    <input type="text" id="shortcutUrl" placeholder="URL" />
+    <button class="save-btn" onclick="saveShortcut()">완료</button>
+    <button class="cancel-btn" onclick="closeModal()">취소</button>
+  </div>
+
+  <!-- ✅ 우클릭 메뉴 -->
+  <div class="context-menu" id="contextMenu">
+    <div onclick="editShortcut()">바로가기 수정</div>
+    <div onclick="deleteShortcut()">삭제</div>
+  </div>
+
+  <div class="social-links">
+    <a href="https://www.instagram.com" target="_blank" class="instagram"><i class="fa-brands fa-instagram"></i></a>
+    <a href="https://www.facebook.com" target="_blank" class="facebook"><i class="fa-brands fa-facebook"></i></a>
+    <a href="https://www.youtube.com" target="_blank" class="youtube"><i class="fa-brands fa-youtube"></i></a>
+  </div>
+
+  <footer>© 2025 식단 도우미 — 건강한 식습관을 위한 스마트 검색</footer>
+
+  <script>
+    /* ✅ 랜덤 문구 */
+    const recommendMessages = [
+      "오늘은 🍱 비빔밥 어때요?",
+      "오늘은 🍛 카레 어때요?",
+      "오늘은 🍲 된장찌개 어때요?",
+      "오늘은 🥗 샐러드 어때요?",
+      "오늘은 🍝 파스타 어때요?",
+      "오늘은 🌶️ 닭갈비 어때요?",
+      "오늘은 🍗 불고기 어때요?",
+      "오늘은 🍜 김치찌개 어때요?!",
+      "오늘은 🍚 제육볶음 어때요?",
+      "오늘은 🥢 참치마요 덮밥 어때요?",
+      "오늘은 🍢 오뎅탕 어때요?",
+      "오늘은 🥦 브로콜리 샐러드 어때요?",
+      "오늘은 🍙 삼각김밥으로 간단하게!",
+      "오늘은 🍠 고구마 구이 어때요?",
+      "오늘은 🍳 오믈렛 어때요?",
+      "오늘은 🍤 새우튀김 어때요?",
+      "오늘은 🍛 순두부찌개 어때요?",
+      "오늘은 🥶 냉면 어때요?",
+      "오늘은 🍗 치킨 어때요?",
+      "오늘은 ☕ 미숫가루 한 잔 어때요?"
+    ];
+
+    const subMessages = [
+      "좋은 아침이에요 ☀️ 오늘은 가볍게 샐러드 어때요?",
+      "오늘 하루도 화이팅 💪 따뜻한 국 한 그릇 어때요?",
+      "맛있는 식사는 최고의 힐링이에요 🍜",
+      "작은 식습관이 큰 변화를 만듭니다 🌿",
+      "든든하게 먹고 에너지 충전 완료 ⚡",
+      "오늘은 나를 위한 건강한 한 끼 어떠세요? 🍱",
+      "한 숟가락씩 천천히, 마음도 함께 채워요 💚",
+      "식사는 잠깐이지만 건강은 평생이에요 🌞",
+      "포만감과 행복, 그 두 가지를 모두 챙기세요 😊",
+      "가볍지만 영양 가득한 하루 되세요 🥗"
+    ];
+
+    const subText = document.getElementById("subText");
+    const recommendEl = document.getElementById("recommend");
+    let subIndex = 0;
+    let recIndex = 0;
+
+    function changeTexts() {
+      subText.classList.remove("fade-in");
+      recommendEl.classList.remove("fade-in");
+      subText.classList.add("fade-out");
+      recommendEl.classList.add("fade-out");
+
+      setTimeout(() => {
+        subIndex = (subIndex + 1) % subMessages.length;
+        recIndex = (recIndex + 1) % recommendMessages.length;
+        subText.textContent = subMessages[subIndex];
+        recommendEl.innerHTML = recommendMessages[recIndex];
+        subText.classList.remove("fade-out");
+        recommendEl.classList.remove("fade-out");
+        subText.classList.add("fade-in");
+        recommendEl.classList.add("fade-in");
+      }, 800);
+    }
+    setInterval(changeTexts, 5000);
+
+    /* ✅ 검색 기능 복원 */
+    document.getElementById("menuInput").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        const q = e.target.value.trim().toLowerCase();
+        if (!q) return;
+
+        if (q.includes("캘린더") || q.includes("planner") || q.includes("일정")) {
+          location.href = "/calendar";
+        } else if (q.includes("레시피") || q.includes("식단")) {
+          location.href = "/recipe";
+        } else if (q.includes("장보기") || q.includes("쇼핑")) {
+          location.href = "/shopping-list";
+        } else if (q.includes("대시보드")) {
+          location.href = "/dashboard";
+        } else if (q.includes("추천")) {
+          location.href = "/recommend";
+        } else {
+          location.href = "/main";
+        }
+      }
+    });
+
+    /* ✅ 바로가기 기능 */
+    let shortcuts = JSON.parse(localStorage.getItem("shortcuts")) || [];
+    const container = document.getElementById("shortcutContainer");
+    const modal = document.getElementById("shortcutModal");
+    const contextMenu = document.getElementById("contextMenu");
+    let editingIndex = null, contextTarget = null;
+
+    function renderShortcuts() {
+      const addBtn = container.querySelector(".add-card");
+      container.innerHTML = "";
+      shortcuts.forEach((sc, i) => {
+        const div = document.createElement("div");
+        div.className = "shortcut-card";
+        div.innerHTML = `<i class="fa-solid fa-link"></i><span>${sc.name}</span>`;
+        div.onclick = () => window.open(sc.url, "_blank");
+        div.oncontextmenu = (e) => {
+          e.preventDefault();
+          contextTarget = i;
+          contextMenu.style.display = "block";
+          contextMenu.style.left = e.pageX + "px";
+          contextMenu.style.top = e.pageY + "px";
+        };
+        container.appendChild(div);
+      });
+      container.appendChild(addBtn);
+    }
+    renderShortcuts();
+
+    function openModal(edit=false) {
+      modal.style.display = "block";
+      if (edit && contextTarget !== null) {
+        document.getElementById("shortcutName").value = shortcuts[contextTarget].name;
+        document.getElementById("shortcutUrl").value = shortcuts[contextTarget].url;
+        editingIndex = contextTarget;
+      } else {
+        editingIndex = null;
+        document.getElementById("shortcutName").value = "";
+        document.getElementById("shortcutUrl").value = "";
+      }
+    }
+    function closeModal() { modal.style.display = "none"; }
+
+    function saveShortcut() {
+      const name = document.getElementById("shortcutName").value.trim();
+      const url = document.getElementById("shortcutUrl").value.trim();
+      if (!name || !url) return alert("이름과 URL을 모두 입력하세요!");
+      if (editingIndex !== null) shortcuts[editingIndex] = { name, url };
+      else shortcuts.push({ name, url });
+      localStorage.setItem("shortcuts", JSON.stringify(shortcuts));
+      renderShortcuts(); closeModal();
+    }
+
+    function editShortcut() { closeContextMenu(); openModal(true); }
+    function deleteShortcut() {
+      if (contextTarget !== null) {
+        shortcuts.splice(contextTarget, 1);
+        localStorage.setItem("shortcuts", JSON.stringify(shortcuts));
+        renderShortcuts(); closeContextMenu();
+      }
+    }
+    function closeContextMenu() { contextMenu.style.display = "none"; }
+    document.addEventListener("click", (e) => {
+      if (!contextMenu.contains(e.target)) closeContextMenu();
+    });
+  </script>
+</body>
+</html>
